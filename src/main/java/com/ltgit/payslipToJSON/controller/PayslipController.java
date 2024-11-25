@@ -1,6 +1,7 @@
 package com.ltgit.payslipToJSON.controller;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -9,11 +10,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.ltgit.payslipToJSON.dto.FileUploadResponse;
+import com.ltgit.payslipToJSON.model.payslip.Payslip;
 import com.ltgit.payslipToJSON.service.PayslipToJsonService;
 
 @RestController
@@ -41,4 +45,17 @@ public class PayslipController {
         }
     }
 
+    @PostMapping("/parse")
+    public ResponseEntity<String> parsePayslipData(@RequestBody FileUploadResponse fileUploadResponse) {
+        log.info("Processing file: {}", fileUploadResponse.getFileName());
+        List<Payslip> payslips = fileUploadResponse.getPayslips();
+
+        for (Payslip payslip : payslips) {
+            log.info("Employee: {} - Net Pay: {}", 
+                     payslip.getHeader().getEmployeeName(), 
+                     payslip.getBody().getNetPay());
+        }
+
+        return ResponseEntity.ok("Payslips processed successfully!");
+    }
 }
